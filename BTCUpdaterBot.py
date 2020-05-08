@@ -24,7 +24,10 @@ def insertInIDs(id):
 
 
 def stopUpdatingMe(idToPop):
-    IDToSend.remove(idToPop)
+    if id in IDToSend:
+        IDToSend.remove(idToPop)
+    else:
+        pass
 
     reply = "You will no longer get updated."
     sendMessage(reply, idToPop)
@@ -41,9 +44,9 @@ def tellMeAboutBTC(senderID):
     btcData = btcRawData.text
     btcData = json.loads(btcData)
 
-    reply = ""
+    reply = "All the current currencies exchange rate (in alphabetical order):"
 
-    for ctrs in countries:
+    for ctrs in countriesFull:
         for words in params:
             currentSymbol = btcData["{}".format(ctrs)]["symbol"]
             print(currentSymbol)
@@ -60,7 +63,7 @@ def tellMeAboutBTC(senderID):
 def getUpdates(offset = None):
     print("NOW IN GETUPDATES")
 
-    url = base + "/getUpdates?timeout=60"
+    url = base + "/getUpdates?timeout=100"
     if offset:
         url = url + "&offset={}".format(offset + 1)
     r = requests.get(url)
@@ -123,15 +126,13 @@ if __name__ == "__main__":
                     reply = "Sorry, that was not a valid command. Please try again."
                     sendMessage(reply, fromId)
 
-        currentTime = requests.get('http://worldclockapi.com/api/json/utc/now')
-        time = currentTime.text
-        time = json.loads(time)
-        time = time["currentDateTime"]
-        time = time.split('T')
-        time = time[1].split('Z')
-        time = time[0]
-        time = time[3:5]
+        import datetime
 
-        if time == "00":
+        t = datetime.datetime.now()
+        time = t.minute
+        print(t.minute)
+
+        if str(time) == "0":
+            print("Sending Data to all users.")
             for id in IDToSend:
                 tellMeAboutBTC(id)
